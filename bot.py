@@ -3,6 +3,7 @@ from settings import HOST, PORT, USERNAME, CLIENT_ID, OAUTH_TOKEN, CHANNEL
 import irc.bot
 import requests
 import RPi.GPIO as GPIO
+import time
 
 Forward = 11
 Backward = 13
@@ -40,65 +41,69 @@ class RCTwitchBot(irc.bot.SingleServerIRCBot):
 
     def on_pubmsg(self, c, e):
         if e.arguments[0][:1] == '!':
-            cmd = e.arguments[0].split(' ')[0][1:]
-            print('Received command: ' + cmd)
-            self.do_command(e, cmd)
+            whole_cmd = e.arguments[0].split(' ')
+            if len(whole_cmd) == 2:
+                cmd = whole_cmd[0][1:]
+                time = float(whole_cmd[1])
+                if time >= 0.2 and time <= 1:
+                    self.do_command(e, cmd, time)
+
 
     '''Available commands: fr, fl, f, br, bl, b'''
-    def do_command(self, e, cmd):
+    def do_command(self, e, cmd, time):
         if cmd == 'f':
-            forward(MOVE_TIME)
+            self.forward(time)
 
         elif cmd == 'fr':
-            forwardright(MOVE_TIME)
+            self.forwardright(time)
         
         elif cmd == 'fl':
-            forwardleft(MOVE_TIME)
+            self.forwardleft(time)
 
         elif cmd == 'b':
-            backward(MOVE_TIME)
+            self.backward(time)
 
         elif cmd == 'br':
-            backwardright(MOVE_TIME)
+            self.backwardright(time)
 
         elif cmd == 'bl':
-            backwardleft(MOVE_TIME)
+            self.backwardleft(time)
 
         else:
             print('bad command: ' + str(cmd))
 
-    def forward(n : int):
+    def forward(self, n : float):
         GPIO.output(Forward, GPIO.HIGH)
         time.sleep(n)
         GPIO.output(Forward, GPIO.LOW)
 
-    def backward(n : int):
+    def backward(self, n : float):
         GPIO.output(Backward, GPIO.HIGH)
         time.sleep(n)
         GPIO.output(Backward, GPIO.LOW)
 
-    def forwardright(n : int):
+    def forwardright(self, n : float):
         GPIO.output(Forward, GPIO.HIGH)
         GPIO.output(Right, GPIO.HIGH)
         time.sleep(n)
         GPIO.output(Forward, GPIO.LOW)
         GPIO.output(Right, GPIO.LOW)
 
-    def forwardleft(n : int):
+    def forwardleft(self, n : float):
         GPIO.output(Forward, GPIO.HIGH)
         GPIO.output(Left, GPIO.HIGH)
         time.sleep(n)
         GPIO.output(Forward, GPIO.LOW)
         GPIO.output(Left, GPIO.LOW)
 
-    def backwardright(n : int):
+    def backwardright(self, n : float):
         GPIO.output(Backward, GPIO.HIGH)
         GPIO.output(Right, GPIO.HIGH)
         time.sleep(n)
         GPIO.output(Backward, GPIO.LOW)
         GPIO.output(Right, GPIO.LOW)
 
-    def backwardleft(n : int):
+    def backwardleft(self, n : float):
         GPIO.output(Backward, GPIO.HIGH)
         GPIO.output(Left, GPIO.HIGH)
         time.sleep(n)
