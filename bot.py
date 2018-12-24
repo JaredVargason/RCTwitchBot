@@ -44,9 +44,12 @@ class RCTwitchBot(irc.bot.SingleServerIRCBot):
             whole_cmd = e.arguments[0].split(' ')
             if len(whole_cmd) == 2:
                 cmd = whole_cmd[0][1:]
-                time = float(whole_cmd[1])
-                if time >= 0.2 and time <= 1:
-                    self.do_command(e, cmd, time)
+                try:
+                    time = float(whole_cmd[1])
+                    if time >= 0.25 and time <= .75:
+                        self.do_command(e, cmd, time)
+                except ValueError:
+                    print("not a float")
 
 
     '''Available commands: fr, fl, f, br, bl, b'''
