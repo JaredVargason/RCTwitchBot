@@ -5,7 +5,8 @@ import time
 Forward = 11
 Backward = 13
 Left = 16
-Right = 18
+Right = 18 
+
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(Forward, GPIO.OUT)
