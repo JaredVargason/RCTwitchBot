@@ -2,7 +2,6 @@
 import irc.bot
 import requests
 import time
-from threading import Thread
 import RPi.GPIO as GPIO
 
 from settings import HOST, PORT, USERNAME, CLIENT_ID, OAUTH_TOKEN, CHANNEL
@@ -40,8 +39,8 @@ class RCTwitchBot(irc.bot.SingleServerIRCBot):
         print('Connecting to ' + HOST + ' on port ' + str(PORT))
         irc.bot.SingleServerIRCBot.__init__(self, [(HOST, PORT, oauth_token)], 'gits', 'gits')
 
-        self.directionDict = {'f' : self.f, 'fr' : self.fr, 'fl' : self.fl,
-                            'b' : self.b, 'br' : self.br, 'bl' : self.bl}
+        self.directionDict = {'f' : RCTwitchBot.f, 'fr' : RCTwitchBot.fr, 'fl' : RCTwitchBot.fl,
+                            'b' : RCTwitchBot.b, 'br' : RCTwitchBot.br, 'bl' : RCTwitchBot.bl}
 
     def on_welcome(self, c, e):
         print('Joining ' + self.channel)
@@ -51,6 +50,7 @@ class RCTwitchBot(irc.bot.SingleServerIRCBot):
         c.cap('REQ', ':twitch.tv/tags')
         c.cap('REQ', ':twitch.tv/commands')
         c.join(self.channel)
+        print('Joined ' + self.channel)
 
     def on_pubmsg(self, c, e):
         if e.arguments[0][0] == '!':
@@ -66,7 +66,7 @@ class RCTwitchBot(irc.bot.SingleServerIRCBot):
         try:
             seconds = float(args[1])
             if seconds >= TIME_MIN and seconds <= TIME_MAX:
-                func(seconds) 
+                func(self, seconds) 
         except:
             return
         print('Successful drive')
