@@ -22,10 +22,10 @@ GPIO.setup(Right, GPIO.OUT)
 
 class RCTwitchBot(irc.bot.SingleServerIRCBot):
 
-    helpList = ['faq', 'help', 'commands']
+    helpCommands = ['faq', 'help', 'commands']
+    directionCommands = ['f', 'fr', 'fl', 'b', 'bl', 'br']
 
     def __init__(self, username, client_id, oauth_token, channel):
-        '''Available commands: fr, fl, f, br, bl, b'''
         self.username = username
         self.client_id = client_id
         self.oauth_token = oauth_token
@@ -55,11 +55,12 @@ class RCTwitchBot(irc.bot.SingleServerIRCBot):
     def on_pubmsg(self, c, e):
         if e.arguments[0][0] == '!':
             args = e.arguments[0][1:].split(' ')
-            key = args[0]
-            if key in self.directionDict.keys():
-                self.drive(key, args)
-            elif key in RCTwitchBot.helpList:
-                self.helpMsg()
+            self.drive2(args)
+            #key = args[0]
+            #if key in self.directionDict.keys():
+            #    self.drive(key, args)
+            #elif key in RCTwitchBot.helpList:
+            #    self.helpMsg()
 
     def drive(self, cmd, args):
         func = self.directionDict[cmd]
@@ -70,6 +71,16 @@ class RCTwitchBot(irc.bot.SingleServerIRCBot):
         except:
             return
         print('Successful drive')
+
+    def drive2(self, args):
+        func = args[0]
+        if func in RCTwitchBot.directionCommands:
+            try:
+                seconds = float(args[1])
+                if seconds >= TIME_MIN and seconds <= TIME_MAX:
+                    exec('self.' + func + '(' + args[1]+ ')')
+            except:
+                pass
 
     def helpMsg(self):
         c = self.connection
